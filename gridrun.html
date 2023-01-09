@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="Square.class.js"></script>
+    <script src="Row.class.js"></script>
+    <script src="Gridrun.class.js"></script>
+    <link rel="stylesheet" href="gridrun.css">
+</head>
+<body>
+    <h1>GridrunJS</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Moves:</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td id="scoreMoves"> </td></tr>
+        </tbody>
+    </table>
+    <div id="game"></div>
+    <nav>
+        <ul>
+            <li><button id="resetBoard">Reset</button></li>
+        </ul>
+    </nav>
+    <script>
+        const game = new Gridrun(document.getElementById('game'), 10, 10);
+    </script>
+</body>
+</html>
