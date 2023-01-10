@@ -18,6 +18,9 @@ class Gridrun {
         this.initializeGame();
     }
 
+    /**
+     * Created initial HTML for gameboard, adds event listeners, and finally draws the gameboard.
+     */
     initializeGame() {
         this.gameElement.appendChild(document.createElement('ul'));
 
@@ -50,6 +53,10 @@ class Gridrun {
         this.drawBoard();
     }
 
+    
+    /**
+     * Draws gameboard
+     */
     drawBoard() {
         document.getElementById('scoreMoves').innerText = this.scores.moves;
         
@@ -77,6 +84,9 @@ class Gridrun {
         });
     }
 
+    /**
+     * Dumps player coords and any future helpful debug info to console log.
+     */
     debug() {
         console.log(
             `
@@ -87,47 +97,72 @@ class Gridrun {
     }
 
 
+    /**
+     * Handles player movement
+     * @param {string} direction  (up, down, left, right)
+     */
     movePlayer(direction) {
         // Remove player from previous square, indicate they were there.
         this.board[this.playerCoords.row][this.playerCoords.col].character = this.visitedChar;
         this.board[this.playerCoords.row][this.playerCoords.col].isPlayer = true;
+        this.board[this.playerCoords.row][this.playerCoords.col].visited = true;
 
         // Handle the directional move
+        let newRow = this.playerCoords.row;
+        let newCol = this.playerCoords.col;
+
         switch(direction) {
             case 'down':
                 if (this.playerCoords.row < (this.rowCount - 1)) {
-                    this.playerCoords.row++;
+                    newRow++;
                 }
                 break;
 
             case 'up':
                 if (this.playerCoords.row > 0) {
-                    this.playerCoords.row--;
+                    newRow--;
                 }
                 break;
 
 
             case 'left':
                 if (this.playerCoords.col > 0) {
-                    this.playerCoords.col--;
+                    newCol--;
                 }
                 break;
 
             case 'right':
                 if (this.playerCoords.col < (this.colCount - 1)) {
-                    this.playerCoords.col++;
+                    newCol++;
                 }
                 break;
             
             default:
         }
 
+        if (this.canMoveToSquare(newRow, newCol)) {
+            this.scores.moves++;
 
-        this.scores.moves++;
-        // Redraw game board
-        this.drawBoard();
+            this.playerCoords.row = newRow;
+            this.playerCoords.col = newCol;
+            // Redraw game board
+            this.drawBoard();
+        }        
     }
 
+    /**
+     * Checks if provided coordinates can be visited by player.
+     * @param {int} row 
+     * @param {int} col 
+     * @returns 
+     */
+    canMoveToSquare(row, col) {
+        return !this.board[row][col].visited;
+    }
+
+    /**
+     * Reset gameboard to initial state...sorta.
+     */
     resetBoard() {
         this.gameElement.classList.add('resetting');
 

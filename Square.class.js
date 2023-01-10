@@ -1,7 +1,7 @@
 class Square {
-    constructor(character = '', touchable = true) {
-        this.touched = false;
-        this.touchable = touchable;
+    constructor(character = '', visitable = true) {
+        this.visited = false;
+        this.visitable = visitable;
         this.character = character;
         this.isPlayer = false;
     }
