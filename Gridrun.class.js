@@ -4,16 +4,14 @@ class Gridrun {
         this.rowCount = rowCount;
         this.colCount = colCount;
         this.board = [];
-        this.playerChar = '☼';
-        this.visitedChar = '♦';
-        this.blankChar = '□'
-        this.playerCoords = {
-            col: 0,
-            row: 0
-        };
+        this.playerChar = '😀';
+        this.visitedChar = '💩';
+        this.blankChar = '🍎'
+        this.playerCoords = {};
         this.scores = {
             moves: 0,
         }
+        this.eventListenersCreated = false;
 
         this.initializeGame();
     }
@@ -22,34 +20,48 @@ class Gridrun {
      * Created initial HTML for gameboard, adds event listeners, and finally draws the gameboard.
      */
     initializeGame() {
+        // Build the board elements
+        this.gameElement.innerHTML = '';
+        this.board = [];
+        this.playerCoords = {
+            col: 0,
+            row: 0
+        };
         this.gameElement.appendChild(document.createElement('ul'));
 
         for (let i = 0; i < this.rowCount; i++) {
             this.board.push(new Row(this.colCount, this.blankChar).getSquares());
         }
 
-        document.addEventListener('keydown', (event) => {
-            switch(event.key){
-                case 'ArrowUp':
-                    this.movePlayer('up');
-                    break;
-                case 'ArrowDown':
-                    this.movePlayer('down');
-                    break;
-                case 'ArrowLeft':
-                    this.movePlayer('left');
-                    break;
-                case 'ArrowRight':
-                    this.movePlayer('right');
-                    break;
-                default:
-            }
-        })
-        
-        document.getElementById('resetBoard').addEventListener('click', () => {
-            this.resetBoard();
-        });
+        // If event listeners haven't already been created, create them. 
+        // For example, if player reset game, listeners will already exist.
+        if (!this.eventListenersCreated) {
+            document.addEventListener('keydown', (event) => {
+                switch(event.key){
+                    case 'ArrowUp':
+                        this.movePlayer('up');
+                        break;
+                    case 'ArrowDown':
+                        this.movePlayer('down');
+                        break;
+                    case 'ArrowLeft':
+                        this.movePlayer('left');
+                        break;
+                    case 'ArrowRight':
+                        this.movePlayer('right');
+                        break;
+                    default:
+                }
+            })
+            
+            document.getElementById('resetBoard').addEventListener('click', () => {
+                this.resetBoard();
+            });
 
+            this.eventListenersCreated = true;
+        }
+
+        // Finally, draw the board.
         this.drawBoard();
     }
 
@@ -71,13 +83,16 @@ class Gridrun {
         this.gameElement.innerHTML = '';
         this.board.forEach(row => {
             const listItem = document.createElement('li');
-            let rowText = '';
-
+            const colList = document.createElement('ul');
 
             row.forEach(square => {
-                rowText += square.character;
+                const colListItem = document.createElement('li');
+                colListItem.innerHTML = `<span>${square.character}</span>`;
+                colList.appendChild(colListItem);
             });
-            listItem.innerHTML = rowText;
+
+
+            listItem.appendChild(colList);
 
 
             this.gameElement.appendChild(listItem);
@@ -95,7 +110,6 @@ class Gridrun {
             `
         );
     }
-
 
     /**
      * Handles player movement
@@ -157,7 +171,11 @@ class Gridrun {
      * @returns 
      */
     canMoveToSquare(row, col) {
-        return !this.board[row][col].visited;
+        if(this.board[row][col].visited || this.board[row][col].vistable === false) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -175,8 +193,30 @@ class Gridrun {
             this.scores[scoreKey] = 0;
         });
 
-        this.drawBoard();
+        // Set all characters to bombs
+        this.updateAllChars('💣');
+
+        setTimeout(() => {
+            this.updateAllChars('💥');
+            setTimeout(() => {
+                this.gameElement.classList.remove('resetting');
+                this.initializeGame();
+            }, 500)
+        }, 500);
     }
 
+    /**
+     * Replace all characters on board with given character
+     * @param {string} char 
+     */
+    updateAllChars(char) {
+        this.board.forEach(row => {
+            row.forEach(col => {
+                col.character = char;
+            })
+        });
+
+        this.drawBoard();
+    }
     
 }
