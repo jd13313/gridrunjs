@@ -69,14 +69,15 @@ class Gridrun {
     /**
      * Draws gameboard
      */
-    drawBoard() {
+    drawBoard(charUpdates = {}) {
         document.getElementById('scoreMoves').innerText = this.scores.moves;
-        
 
+        const playerChar = charUpdates?.player ?? this.playerChar;
+        
         // Identify player
         this.board[this.playerCoords.row][this.playerCoords.col] = {
             ...this.board[this.playerCoords.row][this.playerCoords.col],
-            character: this.playerChar,
+            character: playerChar,
             isPlayer: true
         }
 
@@ -159,8 +160,14 @@ class Gridrun {
 
             this.playerCoords.row = newRow;
             this.playerCoords.col = newCol;
-            // Redraw game board
-            this.drawBoard();
+
+            this.drawBoard({
+                player: '😐'
+            });
+
+            setTimeout(() => {
+                this.drawBoard();
+            }, 250)
         }        
     }
 
@@ -217,6 +224,5 @@ class Gridrun {
         });
 
         this.drawBoard();
-    }
-    
+    }    
 }
